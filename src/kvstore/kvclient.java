@@ -91,10 +91,8 @@ public class kvclient {
 	   String key = EMPTY_STRING;
 	   Result res = null;	
 	   
-	   String o1 = (operation.substring(operation.indexOf("-") + 1, operation.length()));
-	   System.out.println(o1);
-	   switch (o1) {
-	   
+	   operation = (operation.substring(operation.indexOf("-") + 1, operation.length()));
+	   switch (operation) {	   
 		   case "get":
 			   if(null != args[3]){
 				   //To Do 
