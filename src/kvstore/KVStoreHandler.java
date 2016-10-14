@@ -10,12 +10,12 @@ public class KVStoreHandler implements KVStore.Iface {
 	
  @Override
  public Result kvset(String key, String value) throws TException {
-  	kvStoreMap.put(key, value);
-  	return new Result("", ErrorCode.kSuccess, "Set success");  	
+  	String previousValue = kvStoreMap.put(key, value);
+  	return new Result(previousValue, ErrorCode.kSuccess, "Set success");  	
  }
 
  @Override 
- public Result kvget(String key) throws org.apache.thrift.TException {
+ public Result kvget(String key) throws TException {
 	 if(kvStoreMap.containsKey(key)) {
 		 return new Result(kvStoreMap.get(key), ErrorCode.kSuccess, "Get success");
 	 }
@@ -26,7 +26,7 @@ public class KVStoreHandler implements KVStore.Iface {
  }
 
  @Override
- public Result kvdelete(String key) throws org.apache.thrift.TException {
+ public Result kvdelete(String key) throws TException {
  	if(kvStoreMap.containsKey(key)) {
  		String value = kvStoreMap.remove(key);
  		return new Result(value, ErrorCode.kSuccess, "Delete success");
