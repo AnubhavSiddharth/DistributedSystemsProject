@@ -18,7 +18,7 @@ public class kvclient {
 	 *  Function to print generalized error.
 	 */
 	static void printError(){
-		System.out.println("Bad command!!");
+		System.out.println("Bad command!");
 		System.exit(2);
 	}
 	
@@ -56,7 +56,7 @@ public class kvclient {
 			}
 		}
 		else {
-			System.out.println("Empty REsult");
+			System.out.println("Empty Result");
 			System.exit(2);
 		}
 	}
@@ -89,9 +89,11 @@ public class kvclient {
 	   
 	   String operation = args[2];
 	   String key = EMPTY_STRING;
-	   Result res = null;	   
+	   Result res = null;	
 	   
-	   switch(operation.substring(operation.indexOf("-") + 1, operation.length() - 1))  {
+	   String o1 = (operation.substring(operation.indexOf("-") + 1, operation.length()));
+	   System.out.println(o1);
+	   switch (o1) {
 	   
 		   case "get":
 			   if(null != args[3]){
@@ -111,6 +113,7 @@ public class kvclient {
 				   key = args[3];
 				   String value = args[4];
 				   res = client.kvset(key, value);
+
 				   processResult(res);
 			   }
 			   else{
