@@ -18,7 +18,7 @@ public class kvserver {
   } 
 
   catch (Exception e) {
-   e.printStackTrace();
+	  e.printStackTrace();
   }
  }
  

@@ -1,6 +1,5 @@
 package kvstore;
 
-import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
@@ -10,9 +9,10 @@ import org.apache.thrift.transport.TTransportException;
 public class kvclient {
 	
 	public static final String EMPTY_STRING = "";
-	public static final int SUCCESS = 0;
-	public static final int NOT_FOUND = 1;
-	public static final int ERROR = 2;
+	public static final String GET = "get";
+	public static final String SET = "set";
+	public static final String DEL = "del";
+	
 	
 	/**
 	 *  Function to print generalized error.
@@ -23,35 +23,49 @@ public class kvclient {
 	}
 	
 	/**
+	 *  Method to print insufficient number of arguments exception.
+	 */
+	static void printInsuffNoOfArgs(){
+		System.out.println("Insufficient Number of Arguments!");
+		System.exit(2);
+	}
+	
+	/**
 	 * @param result
 	 * 
 	 * Function to process result object.
 	 */
-	static void processResult(Result result){
+	static void processResult(Result result,String method){
 		String errorText = EMPTY_STRING;
 		if(null != result){
 			ErrorCode errorCode =  result.getError();
-			switch(errorCode.getValue()){
-				case SUCCESS:
+			switch(errorCode){
+				case kSuccess:
 					String value = result.getValue();
-					System.out.println(value);
-					System.exit(SUCCESS);
+					errorText = result.getErrortext();
+					if(method == GET){
+						System.out.println(value);
+					}
+					if(null != errorText) {
+						System.err.println(errorText);
+					}
+					System.exit(errorCode.getValue());
 					break;
 					
-				case NOT_FOUND:
+				case kKeyNotFound:
 					errorText = result.getErrortext();
 					if(null != errorText) {
-						System.out.println(errorText);
+						System.err.println(errorText);
 					}
-					System.exit(NOT_FOUND);
+					System.exit(errorCode.getValue());
 					break;
 					
-				case ERROR:
+				case kError:
 					errorText = result.getErrortext();
 					if(null != errorText) {
-						System.out.println(errorText);
+						System.err.println(errorText);
 					}
-					System.exit(ERROR);
+					System.exit(errorCode.getValue());
 					break;
 			}
 		}
@@ -93,40 +107,47 @@ public class kvclient {
 	   
 	   operation = (operation.substring(operation.indexOf("-") + 1, operation.length()));
 	   switch (operation) {	   
-		   case "get":
-			   if(null != args[3]){
-				   //To Do 
-				   String filename = args[5];
-				   key = args[3];
-				   res = client.kvget(key);
-				   
-				   processResult(res);
+		   case GET:
+			   try{
+				   if(null != args[3]){
+					   //To Do 
+					   //String filename = args[5];
+					   key = args[3];
+					   res = client.kvget(key);
+					   
+					   processResult(res,GET);
+				   }
 			   }
-			   else{
-				  printError();
+			   catch(Exception e){
+				   printError();
 			   }
 			   break;
-		   case "set":
-			   if(null != args[3] && null != args[4]){
-				   key = args[3];
-				   String value = args[4];
-				   res = client.kvset(key, value);
+		   case SET:
+			   try{
+				   if(null != args[3] && null != args[4]){
+					   key = args[3];
+					   String value = args[4];
+					   res = client.kvset(key, value);
 
-				   processResult(res);
+					   processResult(res,SET);
+				   }
 			   }
-			   else{
+			   catch(Exception e){
 				   printError();
-			   }
+			   }			   
 			   break;
-		   case "del":
-			   if(null != args[3]){
-				   key = args[3];
-				   res = client.kvdelete(key);
-				   processResult(res);
+		   case DEL:
+			   try{
+				   if(null != args[3]){
+					   key = args[3];
+					   res = client.kvdelete(key);
+					   processResult(res,DEL);
+				   }
 			   }
-			   else{
+			   catch(Exception e){
 				   printError();
 			   }
+			   
 			   break;
 			   
 			 default:
@@ -139,11 +160,15 @@ public class kvclient {
 	  } 
 	
 	  catch (TTransportException e) {
-	   e.printStackTrace();
+	   //e.printStackTrace();
+	   System.out.println("Server not Running");
+	   System.exit(2);
 	  } 
-	
-	  catch (TException x) {
-	   x.printStackTrace();
+	  catch(ArrayIndexOutOfBoundsException ae){
+		  printInsuffNoOfArgs();
+	  }
+	  catch (Exception e) {
+		  printError();
 	  }
 	 }
 
